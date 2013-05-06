@@ -1,11 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import re
+import math
 
 #little model to learn stress data for words
 #and add stress for unknown words
 
-DATA_FILENAME = "data/gcide/gcide-0.51/clean.lower.undup.CIDE"
+DATA_FILENAME = "data/gcide/gc/wordlist.CIDE"
 
 CHAR_LIST =["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v" "w" "x", "y", "z", "à", "á", "â", "ã", "ä", "æ", "ç", "è", "é", "ê", "î", "ï", "ñ", "ó", "ô", "ö", "ù", "û", "ü", "œ"]
 
@@ -57,6 +58,7 @@ def derive_stress(word):
     split = re.split('([\*|\"|`])', word)
 
     length = 0
+
     for i in xrange(len(split)/2):
         syll = split[i*2]
         stress_mark = split[i*2 + 1]
@@ -92,7 +94,8 @@ def find_syllable_core(syll):
         return syll.index("r")
     #TODO more heuristics? l, w, m, n, etc cores
     else:
-        return floor(len(syll)/2)
+        print "#####", syll
+        return int(math.floor(len(syll)/2))
 
     # TODO maybe add a mitigating factor to force the core toward
     # the center of a long syllable
@@ -147,6 +150,7 @@ if __name__ == "__main__":
         stressed_word = data[word]
         stresses = derive_stress(stressed_word)
 
+        #print stressed_word
         print print_stress(stresses)
         print word
         print ""

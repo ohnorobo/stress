@@ -1,0 +1,213 @@
+      1  
+      1 1st & 3d pers. sing. pres.
+      1 2d per. sing.
+      1 2d pers. sing.
+      1 2d pers. sing. imp.
+      5 2d pers. sing. pres.
+      1 3d pers. pres.
+      1 3d pers. sing.
+      1 3d pers. sing. pr.
+     19 3d pers. sing. pres.
+      1 3d pers. sing. present
+      3 3d sing. pr.
+      1 3d sing. pres.
+      2 3d. pers. sing. pres.
+      1 Compar.
+      1 PROP. n. pl.
+      1 Prop. n.
+      1 a
+      8 a & n.
+  27481 a.
+      2 a. 
+      1 a. & a. pron.
+     79 a. & adv.
+    222 a. & n.
+      4 a. & p. p.
+      1 a. & poss. pron.
+      5 a. & pron.
+      1 a. & v.
+      1 a. & v. t.
+      7 a. & vb. n.
+      1 a. .
+      1 a. compar.
+      1 a. fem.
+      1 a. m.
+      1 a. masc.
+      1 a. or pron.
+      2 a. pron.
+      1 a. superl.
+      4 a., adv., & n.
+      1 a., compar.
+      1 a., n., & adv.
+      1 abl.
+   2228 adj.
+      1 adj. 
+      3 adj. & adv.
+      1 adj. & conj.
+      1 adj. pren.
+     30 adj. prenom.
+      2 ads.
+   3822 adv.
+      1 adv. 
+     51 adv. & a.
+      1 adv. & adj.
+     18 adv. & conj.
+      3 adv. & n.
+      1 adv. & pref.
+      7 adv. & prep.
+      2 adv., prep., & conj.
+      2 auxiliary
+      4 compar.
+     65 conj.
+      1 conj. & adv.
+      1 conj. & prep.
+      1 contrac.
+      1 def. art.
+      1 definite article.
+      1 exclamation
+      1 fem.
+      1 fem. n.
+    186 imp.
+      1 imp. 
+      1 imp. & archaic p. p.
+      1 imp. & obs. p. p.
+    162 imp. & p. p.
+      1 imp. pl.
+      3 imp. pl. & p. p.
+      3 imp. sing.
+      1 imp. sing. & 2d pers. pl.
+      1 imp., p. p., & a.
+      1 imp., p. p., or auxiliary
+      2 imperative sing.
+      1 imperative.
+      2 indef. pron.
+      1 inf. & plural pres.
+    139 interj.
+      2 interj. & adv.
+      4 interj. & n.
+      1 interj., adv., & n.
+      1 interj., adv., or a.
+      1 interrog. adv.
+      1 m.
+      1 masc.
+      1 masc. a.
+      7 n
+  63946 n.
+      4 n. 
+     48 n. & a.
+      1 n. & adj.
+      4 n. & adv.
+      5 n. & interj.
+     99 n. & v.
+      8 n. & v. i.
+     22 n. & v. t.
+      1 n. & v. t. & i.
+      1 n. and v.
+      1 n. collect. & pl.
+      3 n. f.
+      4 n. fem.
+      5 n. m.
+      5 n. masc.
+      4 n. pl
+   1677 n. pl.
+      1 n. pl. & sing.
+      1 n. pl., but sing. or pl. in usage
+      1 n. sing & pl.
+      4 n. sing.
+      1 n. sing. &  pl.
+     53 n. sing. & pl.
+      1 n., a., & v.
+      1 n., sing. & pl.
+      2 n..
+      2 n.pl.
+      1 n.sing. & pl.
+      2 obs. 3d pers. sing. pres.
+      3 obs. imp.
+      2 obs. imp. pl.
+      2 obs. p. p.
+      2 p. & a.
+     68 p. a.
+      3 p. a. & vb. n.
+      1 p. p & a.
+    183 p. p.
+     56 p. p. & a.
+      1 p. p., fem.
+      5 p. pr.
+      3 p. pr. & a.
+      1 p. pr. & rare vb. n.
+      8 p. pr. & vb. n.
+      1 p. pr., a., & vb. n.
+      2 p.a.
+      5 peop. n.
+      1 pers. pron.
+      5 phr.
+      2 phrase
+      6 pl.
+      1 pl. indic. pr.
+      2 pl. pres.
+      1 poss. pron.
+      2 possessive pron.
+      1 postnominal adj.
+      3 pr. a.
+     18 pr. n.
+      2 pr. n. pl.
+      4 pred. a.
+     10 pred. adj.
+     19 pref.
+      5 prefix.
+    129 prep.
+     13 prep. & adv.
+      2 prep. & conj.
+      1 prep. phr.
+      1 prep., adv. & a.
+      1 prep., adv., & conj.
+      1 prep., adv., conj. & n.
+      1 pres. & imp. sing. & pl.
+      1 pres. indic. 1st & 3d pers. sing.
+      1 pres. indic., 1st & 3d pers. sing.
+      2 pret.
+     62 pron.
+     10 pron. & a.
+      2 pron. & conj.
+      5 pron. pl.
+      1 pron., a., & adv.
+      1 pron., a., conj., & adv.
+     97 prop. a.
+      1 prop. a. & n.
+     26 prop. adj.
+   1073 prop. n.
+     82 prop. n. pl.
+      2 prop. n. sing. & pl.
+      1 prop. prop. n.
+      1 prop. v. i.
+      3 prop. v. t.
+      1 sing. pres.
+      5 strong imp.
+      1 subj. 3d pers. sing.
+     24 suff.
+      1 suffix
+      1 suffix.
+      1 superl.
+      1 third pers. sing. pres.
+    138 v.
+     22 v. & n.
+   4561 v. i.
+      1 v. i. & auxiliary.
+      3 v. i. & i.
+      4 v. i. & n.
+     92 v. i. & t.
+      1 v. imperative.
+      3 v. impers.
+      1 v. impersonal, pres.
+      1 v. inf.
+      1 v. n.
+  11119 v. t.
+      1 v. t. 
+      1 v. t. & 
+      3 v. t. &  i.
+      1 v. t. & auxiliary.
+    475 v. t. & i.
+      6 v. t. & n.
+      1 v. t. & v. i.
+      1 v., 3d pers. sing. pres.
+      6 vb. n.
