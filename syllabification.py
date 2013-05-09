@@ -1,10 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from pprint import pprint
-import math
+import math, sys
+from timeout import timeout
 
 SMOOTHING = -1000
-DATA_FILENAME = "data/gcide/gc/wordlist.2.CIDE"
+#DATA_FILENAME = "data/gcide/gc/wordlist.2.CIDE"
+TRAIN_FILENAME = "data/gcide/gc/train"
+TEST_FILENAME = "data/gcide/gc/test"
 
 
 ##TODO
@@ -58,6 +61,7 @@ class syll_model:
 
             self.total_count[l] += 1
 
+    @timeout(15)
     def syllabify(self, word):
         possible_syllabifications = self._all_possible_substrings(word)
 
@@ -120,7 +124,7 @@ class syll_model:
         """
 
         s = re.split('([\*|\"|`])', word)
-        s = filter(lambda a: a not in wordstress.INPUT_STRESS_MARKS, s)
+        s = filter(lambda a: a not in wordstress.INPUT_STRESS_MARKS and not a=='', s)
         return s
 
 
@@ -135,43 +139,48 @@ def score_accuracy(inputs, correct_outputs, f):
     for input, c_output in zip(inputs, correct_outputs):
         print "new: ", input
 
-        output = f(input)
-        if output != c_output:
-            incorrect += 1
-            incorrect_ex.append((output, c_output))
-            print "incorrect: ", (output, c_output)
-        else:
-            correct += 1
-            correct_ex.append((output, c_output))
-            print "correct: ", (output, c_output)
+        try:
+            output = f(input)
+            if output != c_output:
+                incorrect += 1
+                print "incorrect: ", (output, c_output)
+            else:
+                correct += 1
+                print "correct: ", (output, c_output)
 
-        print "correct: ", correct
-        print "incorrect: ", incorrect
-        print "percent correct: ", (1.0*correct)/(correct+incorrect)
+            print "correct: ", correct
+            print "incorrect: ", incorrect
+            print "percent correct: ", (1.0*correct)/(correct+incorrect)
+        except:
+            print "TIMEOUT"
+
+        # to make piping work correctly
+        sys.stdout.flush()
 
 
 
 #####main
 import wordstress, re
+if __name__ == '__main__':
 
-data = wordstress.read_in(DATA_FILENAME)
-s = syll_model()
+    #train
+    data = wordstress.read_in(TRAIN_FILENAME)
+    s = syll_model()
 
-for word, stressed in data.items():
-    sylls = s.split_sylls(stressed)
-    s.train(word, sylls)
+    for word, stressed in data.items():
+        sylls = s.split_sylls(stressed)
+        s.train(word, sylls)
 
-pprint( s.syll_counts )
+    pprint( s.syll_counts )
 
-#for word, stressed in data.items()[:100]:
-#    print stressed
-#    print s.syllabify(word)
 
-#words, stressed = data.items()
-words = data.keys()
-stressed = data.values()
-all_sylls = map(lambda w: s.split_sylls(w), stressed)
-score_accuracy(words, all_sylls, s.syllabify)
+    #test
+    data = wordstress.read_in(TEST_FILENAME)
+
+    words = data.keys()
+    stressed = data.values()
+    all_sylls = map(s.split_sylls, stressed)
+    score_accuracy(words, all_sylls, s.syllabify)
 
 
 
@@ -198,4 +207,6 @@ class TestSyllabification(unittest.TestCase):
 
         self.assertEqual(['ab', 'al', 'ien', 'a', 'tion'],
                          s.split_sylls('ab*al`ien*a"tion'))
+
+        self.assertEqual(["de", "vour"], s.split_sylls('de*vour"'))
 
