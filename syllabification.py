@@ -72,7 +72,7 @@ class syll_model:
 
 
     def score(self, sylls):
-        return sum([self._syll_score(syll) for syll in sylls]) / len(sylls)
+        return sum([self._syll_score(syll) for syll in sylls]) * len(sylls)
         #divide by len so words with fewer sylls aren't penalized
 
 
@@ -127,32 +127,72 @@ class syll_model:
         s = filter(lambda a: a not in wordstress.INPUT_STRESS_MARKS and not a=='', s)
         return s
 
+def find_all_syll_nuclei(sylls):
+    """
+    ENGLISH SPECIFIC
+    Arguments:
+        sylls- list of substrings
+    Returns:
+        a list of integers reprsenting the indexes of the nuclei
+        of the syllables in the word
+    syllable cores are an approximate calculation
+    """
+    cores = []
+
+    for i in xrange(len(sylls)):
+        syll = sylls[i]
+        prev_sylls = sylls[:i]
+        len_prev_sylls = sum(map(len, prev_sylls))
+
+        index_syll_core = wordstress.find_syllable_core(syll)
+
+        index = len_prev_sylls + index_syll_core
+        cores.append(index)
+
+    return cores
 
 
 
 def score_accuracy(inputs, correct_outputs, f):
     correct = 0
     incorrect = 0
-    correct_ex = []
-    incorrect_ex = []
+    correct_nuc = 0
+    incorrect_nuc = 0
 
     for input, c_output in zip(inputs, correct_outputs):
         print "new: ", input
 
-        try:
-            output = f(input)
-            if output != c_output:
-                incorrect += 1
-                print "incorrect: ", (output, c_output)
-            else:
-                correct += 1
-                print "correct: ", (output, c_output)
+        #try:
+        output = f(input)
+        if output != c_output:
+            incorrect += 1
+            print "incorrect: ", (output, c_output)
 
-            print "correct: ", correct
-            print "incorrect: ", incorrect
-            print "percent correct: ", (1.0*correct)/(correct+incorrect)
-        except:
-            print "TIMEOUT"
+            nuc_output = find_all_syll_nuclei(output)
+            nuc_correct_output = find_all_syll_nuclei(c_output)
+            print nuc_output, nuc_correct_output
+            if nuc_output == nuc_correct_output:
+                correct_nuc += 1
+                print "but correct nuclei"
+            else:
+                incorrect_nuc += 1
+                print "also incorrect nuclei"
+        else:
+            correct += 1
+            correct_nuc += 1
+            print "correct: ", (output, c_output)
+
+        print "correct: ", correct
+        print "incorrect: ", incorrect
+        print "percent correct: ", (1.0*correct)/(correct+incorrect)
+        print "~~~"
+        print "correct_nuc: ", correct_nuc
+        print "incorrect_nuc: ", incorrect_nuc
+        print "percent correct_nuc: ", (1.0*correct_nuc)/(correct_nuc+incorrect_nuc)
+        print "~~~"
+
+        #except Exception:
+        #    print "TIMEOUT"
 
         # to make piping work correctly
         sys.stdout.flush()
@@ -210,3 +250,6 @@ class TestSyllabification(unittest.TestCase):
 
         self.assertEqual(["de", "vour"], s.split_sylls('de*vour"'))
 
+    def test_find_syll_nuclei(self):
+        self.assertEqual([0, 4, 6, 10],
+                         find_all_syll_nuclei(['arch', 'i', 'man', 'drite'],))
