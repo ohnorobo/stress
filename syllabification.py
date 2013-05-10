@@ -200,7 +200,7 @@ def score_accuracy(inputs, correct_outputs, f):
 
 
 #####main
-import wordstress, re
+import stress, re
 if __name__ == '__main__':
 
     #train

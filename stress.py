@@ -1,85 +1,176 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
+import re
+import math
 
-#made as a result of of my being totally unable to hear stress
+#little model to learn stress data for words
+#and add stress for unknown words
 
+DATA_FILENAME = "data/gcide/gc/wordlist.CIDE"
 
+CHAR_LIST =["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v" "w" "x", "y", "z", "à", "á", "â", "ã", "ä", "æ", "ç", "è", "é", "ê", "î", "ï", "ñ", "ó", "ô", "ö", "ù", "û", "ü", "œ"]
 
-import string
-import curses
-from curses.ascii import isdigit
-import nltk
-from nltk.corpus import cmudict
+VOWEL_LIST =["a", "e", "i", "o", "u", "à", "á", "â", "ã", "ä", "æ", "è", "é", "ê", "î", "ï","ó", "ô", "ö", "ù", "û", "ü", "œ"]
 
+CONSONANT_LIST =[ "b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v" "w" "x", "y", "z", "ç", "ñ"]
 
-# . = unstressed
-# / = stressed
+#marks for input stress, strong, mid, weak
+INPUT_STRESS_MARKS = ["\"", "`", "*"]
 
-
-# TODO
-# dictionary doesn't have contractions (it's, that's)
-# most longer words don't work (infintesimally) - find a way to break and measure common morphemes?
-# fall back on syllables_en.py when unable to find keys in cmudict?
-#   this should also work for nonsense words (fribbled, etc)
-
+#marks for stress. strong, mid, weak
+OUTPUT_STRESS_MARKS = ["/", "\\", "-"]
 
 
 
-d = cmudict.dict()
-
-#count syllables in a single word
-def count_sylls(word):
-    return [len(list(y for y in x if isdigit(y[-1]))) for x in d[word.lower()]]
-
-#count syllables in a string
-def get_n_sylls(line):
-    return sum(count_sylls(remove_punct(y))[0] for y in line.strip().split())
 
 
-def remove_non_ascii(s):
-    return "".join(i for i in s if ord(i)<128)
+#break down into syllabification and stress?
 
-def remove_punct(s):
-    return ''.join([i for i in s if i not in string.punctuation])
+#break down words into # and index of syllable cores
+#   first check that this will work
 
-def get_rep(word):
-    return d[word.lower()]
+#then mark syllable cores for intensity
+
+# default
+
+# break down into default : (1, 0) (3, 1)
+#                            1= index of stress
+#                            0= intensity (0=most, higher=less)
+#  / -
+# default
 
 
-def print_stress(word):
-    forms = [list(y for y in x if isdigit(y[-1])) for x in d[word.lower()]]
-    #print forms
-    stress = [list(pick_stress(syll) for syll in sylls) for sylls in forms]
-    #print stress
+#takes a word with stress marking
+# ex : ab*al`ien*a"tion    n.
+#returns a list of tuples of syllable-core index to stress level
+# ex : [(0, 2),(2, 1),(4, 2),(7, 0),(9, 2)]
+def derive_stress(word):
+    stresses = []
 
-    print " ".join(stress[0])
-    print word
+    #single syllable words
+    if all(not mark in word for mark in INPUT_STRESS_MARKS):
+        word += INPUT_STRESS_MARKS[0]
 
-def pick_stress(syll):
-    if "2" in syll:
-        return "/"
-    if "1" in syll:
-        return "\\"
-    if "0" in syll:
-        return "."
+    #weak final stress
+    if all(word[-1] != mark for mark in INPUT_STRESS_MARKS):
+        word += INPUT_STRESS_MARKS[-1]
+
+    split = re.split('([\*|\"|`])', word)
+
+    length = 0
+
+    for i in xrange(len(split)/2):
+        syll = split[i*2]
+        stress_mark = split[i*2 + 1]
+        stresses.append((length + find_syllable_core(syll),
+                         INPUT_STRESS_MARKS.index(stress_mark)))
+        length += len(syll)
+    return stresses
+
+    # TODO how to deal with multi-word or hyphenated words
+    # missing final stress marks?
+
+
+
+
+
+
+# given a syllable (orthographic) give the index of its code
+# if the core is multichar give the index of the first
+# it's not clear if this is possible, but worth trying
+# "ba" => 1
+# "ab" => 0
+# "this" => 2
+# "sprig" => 3
+# "thought" => 2
+# "rhyme" => 2
+# "you" => 1
+def find_syllable_core(syll):
+    if any(vowel in syll for vowel in VOWEL_LIST):
+        return min(filter(lambda x: x!=-1, [syll.find(vowel) for vowel in VOWEL_LIST]))
+    elif "y" in syll:
+        return syll.index("y")
+    elif "r" in syll:
+        return syll.index("r")
+    #TODO more heuristics? l, w, m, n, etc cores
     else:
-        return "error: " + str(syll)
+        print "#####", syll
+        return int(math.floor(len(syll)/2))
+
+    # TODO maybe add a mitigating factor to force the core toward
+    # the center of a long syllable
 
 
-def get_stress_name(line):
-    return ""
+
+
+
+#takes a list of stress tuples
+# ex : [(0, 2),(2, 1),(4, 2),(7, 0),(9, 2)]
+#prints a stress representation
+# ex : - \ -  / -
+#      abalienation
+def print_stress(stresses):
+    s = [" "]*(stresses[-1][0] + 1)
+    for stress in stresses:
+        s[stress[0]] = OUTPUT_STRESS_MARKS[stress[1]]
+    return "".join(s)
+
+
+#remove any instance of " * or `
+def unstress(word):
+    for stress_mark in INPUT_STRESS_MARKS:
+        word = word.replace(stress_mark, "")
+    return word
+
+
+def read_in(filename):
+    data = {}
+    f = open(filename, "r")
+
+    for line in f:
+        l = line.split('\t')
+        stressed_word = l[0]
+        pos = l[1] #part pf speech
+
+        unstressed_word = unstress(stressed_word)
+
+        #currently ignoring pos, and multiple stresses for different poses
+        data[unstressed_word] = stressed_word
+
+    return data
 
 
 
 
-print get_n_sylls("eat that!")
-#print get_rep("word")
-#print get_rep("antidisestablishmentarianism")
+#main
+if __name__ == "__main__":
+    data = read_in(DATA_FILENAME)
 
-#print_stress("antidisestablishmentarianism")
-#print_stress("inside")
-#print_stress("without")
+    for word in data.keys():
+        stressed_word = data[word]
+        stresses = derive_stress(stressed_word)
+
+        #print stressed_word
+        print print_stress(stresses)
+        print word
+        print ""
 
 
-#stuff
-#http://www.onebloke.com/2011/06/counting-syllables-accurately-in-python-on-google-app-engine/
-#http://stackoverflow.com/questions/1342000/how-to-replace-non-ascii-characters-in-string
+
+
+
+
+import unittest
+
+class TestWordStress(unittest.TestCase):
+
+    def test_derive_stress(self):
+        self.assertEqual([(0, 2),(2, 1),(4, 2),(7, 0),(9, 2)],
+            derive_stress("ab*al`ien*a\"tion"))
+
+    def test_print_stress(self):
+        self.assertEqual("- \ -  / -",
+            print_stress([(0, 2),(2, 1),(4, 2),(7, 0),(9, 2)]))
+
+
+
