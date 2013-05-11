@@ -5,7 +5,7 @@ import math, sys
 from timeout import timeout
 
 SMOOTHING = -1000
-#DATA_FILENAME = "data/gcide/gc/wordlist.2.CIDE"
+ALL_DATA_FILENAME = "data/gcide/gc/wordlist.2.CIDE"
 TRAIN_FILENAME = "data/gcide/gc/train"
 TEST_FILENAME = "data/gcide/gc/test"
 
@@ -124,7 +124,7 @@ class syll_model:
         """
 
         s = re.split('([\*|\"|`])', word)
-        s = filter(lambda a: a not in wordstress.INPUT_STRESS_MARKS and not a=='', s)
+        s = filter(lambda a: a not in stress.INPUT_STRESS_MARKS and not a=='', s)
         return s
 
 def find_all_syll_nuclei(sylls):
@@ -144,7 +144,7 @@ def find_all_syll_nuclei(sylls):
         prev_sylls = sylls[:i]
         len_prev_sylls = sum(map(len, prev_sylls))
 
-        index_syll_core = wordstress.find_syllable_core(syll)
+        index_syll_core = stress.find_syllable_core(syll)
 
         index = len_prev_sylls + index_syll_core
         cores.append(index)
@@ -199,12 +199,10 @@ def score_accuracy(inputs, correct_outputs, f):
 
 
 
-#####main
 import stress, re
-if __name__ == '__main__':
-
+def run_tests():
     #train
-    data = wordstress.read_in(TRAIN_FILENAME)
+    data = stress.read_in(TRAIN_FILENAME)
     s = syll_model()
 
     for word, stressed in data.items():
@@ -215,7 +213,7 @@ if __name__ == '__main__':
 
 
     #test
-    data = wordstress.read_in(TEST_FILENAME)
+    data = stress.read_in(TEST_FILENAME)
 
     words = data.keys()
     stressed = data.values()
@@ -223,8 +221,67 @@ if __name__ == '__main__':
     score_accuracy(words, all_sylls, s.syllabify)
 
 
+def syllabify(word):
+    pass
+def get_nuclei(word):
+    pass
+
+def load_data():
+    data = stress.read_in(ALL_DATA_FILENAME)
+    s = syll_model()
+
+    for word, stressed in data.items():
+        sylls = s.split_sylls(stressed)
+        s.train(word, sylls)
+
+    return s
+
+def print_visual(word, cores):
+    stress = " "*len(word)
+
+    for i in cores:
+        stress = stress[:i] + "*" + stress[i+1:]
+
+    print stress
+    print word
 
 
+#####main
+import functools
+if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print """
+    usage:
+        ./syllabification -p or --performance
+        run a full suite of performance tests
+
+        ./syllabification example
+        returns an output with syllable nuclei marked
+        * *   *
+        example
+
+        import syllabification as s (in another program)
+        s.syllabify("example")
+        returns divided syllables
+        ["ex", "am", "ple"]
+
+        s.get_nuclei("example")
+        returns an array of syllable cores
+        [0, 2, 6]
+    """
+
+    elif sys.argv[1] in ["--performance", "-p"]:
+        run_tests()
+    else:
+        s = load_data()
+        word = sys.argv[1]
+        cores = find_all_syll_nuclei(s.syllabify(word))
+        print_visual(word, cores)
+    exit()
+else:
+    s = load_data()
+    syllabify = s.syllabify
+    get_nuclei = functools.compose(find_all_syll_nuclei, s.syllabify)
 
 
 import unittest
