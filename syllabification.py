@@ -247,7 +247,6 @@ def print_visual(word, cores):
 
 
 #####main
-import functools
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print """
@@ -281,7 +280,7 @@ if __name__ == '__main__':
 else:
     s = load_data()
     syllabify = s.syllabify
-    get_nuclei = functools.compose(find_all_syll_nuclei, s.syllabify)
+    get_nuclei = lambda x:(find_all_syll_nuclei(s.syllabify(x)))
 
 
 import unittest
