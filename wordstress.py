@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import itertools
+from pprint import pprint
 
 ### Informal interface: Model
 # Models have 2 methods
@@ -64,7 +65,7 @@ class FullStressModel:
       self.syll_model.train(word, syll_core, stress)
 
   def score(self, word, syll_cores, stresses, pos=False):
-    print word, syll_cores, stresses, pos
+    #print word, syll_cores, stresses, pos
     # stuff:
     #   a = score of stress pattern
     #   b = score of each individual stress given its syllable
@@ -75,7 +76,7 @@ class FullStressModel:
                [self.syll_model.score(word, syll_core, stress)
                  for syll_core, stress in zip(syll_cores, stresses)],
                1)
-    print score
+    #print score
     return score
 
            # self.pos_model.score(stresses, pos) * \
@@ -88,7 +89,7 @@ class SyllStressModel:
     self.padding = 3 #how many characters we look at to the left/right
 
   def train(self, word, syll_core, stress):
-    print "training on ", word, syll_core, stress
+    #print "training on ", word, syll_core, stress
     count = self.counts[stress]
 
     keys = self._get_keys(word, syll_core)
@@ -97,15 +98,25 @@ class SyllStressModel:
 
   def _get_keys(self, word, syll_core):
     padded_word = " "*self.padding + word + " "*self.padding
+    #print "    padded word: ", padded_word
 
     left = syll_core
-    right = syll_core + self.padding*2
+    right = 1 + syll_core + self.padding*2
     substring = padded_word[left:right]
 
-    return [char+str(i) for i, char in enumerate(substring)]
+    return [(char, str(i)) for i, char in enumerate(substring)]
 
   def score(self, word, syll_core, stress):
-    return 1
+    #print "    syll_model", word, syll_core, stress
+    keys = self._get_keys(word, syll_core)
+    count = self.counts[stress]
+
+    #print "    keys"
+    #pprint(keys)
+    #pprint([count[key] for key in keys])
+
+    s = sum([count[key] for key in keys])
+    return s
 
 
 class WordStressModel:
@@ -113,17 +124,17 @@ class WordStressModel:
   def __init__(self):
     # [stress-seq -> count]
     self.count = CountingDict()
-    self.lengths = CountingDict()
+    #self.lengths = CountingDict()
 
   def train(self, stresses):
-    print "training on ", stresses
-    self.count[frozenset(stresses)] += 1
-    self.lengths[len(stresses)] += 1
+    #print "training on ", stresses
+    self.count[tuple(stresses)] += 1
+    #self.lengths[len(stresses)] += 1
 
   def score(self, stresses):
-    print stresses
+    #print stresses
     # return  C(stresses) / C(length of word)
-    return self.count[frozenset(stresses)] / self.lengths[len(stresses)]
+    return self.count[tuple(stresses)]
 
 class PartofSpeechStressModel:
 
@@ -133,14 +144,14 @@ class PartofSpeechStressModel:
     print self.counts
 
   def train(self, stresses, pos):
-    print "training on ", stresses, pos
+    #print "training on ", stresses, pos
     count = self.counts[pos]
-    count[frozenset(stresses)] += 1
+    count[tuple(stresses)] += 1
 
   def score(self, stresses, pos):
     # return P(stresses | pos)
-    print stresses, pos
-    return self.counts[pos][frozenset(stresses)] / self.counts[pos].total()
+    #print stresses, pos
+    return self.counts[pos][tuple(stresses)] / self.counts[pos].total()
 
 
 
@@ -171,11 +182,14 @@ def annotate(word, pos=False):
   global model
   # score for each possible choice of stresses
   # pick best scoring set
-  syll_cores = syll.syllabify(word)
+  syll_cores = syll.get_nuclei(word)
   possible_stresses = find_all_possible_stresses(len(syll_cores))
-  best = max(possible_stresses, key=lambda possible_stress: model.score(word, possible_stress, pos))
+  best = max(possible_stresses,
+             key=lambda possible_stress: model.score(word, syll_cores, possible_stress, pos))
+  print "====="
   print best
   print syll_cores
+  print word
 
 from copy import deepcopy
 def find_all_possible_stresses(n):
@@ -205,8 +219,8 @@ if __name__ == '__main__':
   else:
     model = FullStressModel()
     train_all_data()
-    annotation = annotate(sys.argv[1], "n.")
-    print annotation
+    for word in sys.argv[1:]:
+        annotate(word, "n.")
 
 else:
   model = FullStressModel()
@@ -230,6 +244,15 @@ class TestWordStress(unittest.TestCase):
 
     self.assertEqual("a" in d, True)
     self.assertEqual("c" in d, False)
+
+    e = CountingDict()
+
+    t = tuple("/")
+    e[t] += 1
+    self.assertEqual(1, e[t])
+    e[t] += 1
+    self.assertEqual(2, e[t])
+
 
   def test_find_all_possible_stresses(self):
 
