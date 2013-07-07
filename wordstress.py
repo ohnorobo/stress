@@ -2,16 +2,11 @@
 import itertools
 from pprint import pprint
 
-### Informal interface: Model
-# Models have 2 methods
-#   train - takes a set of args,
-#           learns about the probability of those args in relation to each other
-#   score - takes the same set of args as train,
-#           returns the probabilities of the args given what it's learned
-
 # stresses
 stress_marks = ["/", "\\", "-"]
 GC = "data/gcide/gc/wordlist.2.CIDE" #data
+GC_90 = "data/gcide/gc/train"
+GC_10 = "data/gcide/gc/test"
 
 def get_pos():
   pos = []
@@ -21,6 +16,12 @@ def get_pos():
   return pos
 pos = get_pos() #all parts of speech in data
 
+### Informal interface: Model
+# Models have 2 methods
+#   train - takes a set of args,
+#           learns about the probability of those args in relation to each other
+#   score - takes the same set of args as train,
+#           returns the probabilities of the args given what it's learned
 
 class CountingDict(dict):
   # a dictionary which allows you to add to ostensible keys
@@ -154,12 +155,31 @@ class PartofSpeechStressModel:
     return self.counts[pos][tuple(stresses)] / self.counts[pos].total()
 
 
+def score_accuracy(inputs, correct_outputs, f):
+  correct = 0
+  incorrect = 0
+
+  for input, c_output, in zip(inputs, correct_outputs):
+    print "input", input
+    output = f(input)
+
+    if output != c_output:
+      incorrect += 1
+      print "incorrect", (output, c_output)
+    else:
+      correct += 1
+
+  print "~~~~~"
+  print "correct", correct
+  print "incorrect", incorrect
+  print "percent correct: ", (1.0*correct)/(correct+incorrect)
+
 
 import stress as util
-def train_all_data():
+def train_all_data(filename):
   global model
 
-  f = file(GC)
+  f = file(filename)
   for line in f:
     print line
     word, pos = line.strip().split("\t")
@@ -176,6 +196,29 @@ def train_all_data():
 
     model.train(word, syll_cores, stresses, pos)
 
+def test_all_data(filename):
+  global model
+
+  correct_outputs = []
+  inputs = []
+
+  f = file(filename)
+  for line in f:
+    print line
+    word, pos = line.strip().split("\t")
+    full_stress = util.derive_stress(word)
+    word = util.unstress(word)
+
+    print "~~~~~~~~~~~~~~~~~testing..."
+    print word
+    print full_stress
+
+    correct_outputs.append(full_stress)
+    inputs.append(word)
+
+  score_accuracy(inputs, correct_outputs, annotate)
+
+
 
 import syllabification as syll
 def annotate(word, pos=False):
@@ -186,10 +229,9 @@ def annotate(word, pos=False):
   possible_stresses = find_all_possible_stresses(len(syll_cores))
   best = max(possible_stresses,
              key=lambda possible_stress: model.score(word, syll_cores, possible_stress, pos))
-  print "====="
-  print best
-  print syll_cores
-  print word
+
+  s = zip(syll_cores, map(lambda x: stress_marks.index(x), best))
+  return s
 
 from copy import deepcopy
 def find_all_possible_stresses(n):
@@ -216,11 +258,20 @@ if __name__ == '__main__':
   if len(sys.argv) == 1:
     print "usage: ./wordstress.py exampleword"
     exit()
+  elif sys.argv[1] == "--performance":
+    model = FullStressModel()
+    train_all_data(GC_90)
+    test_all_data(GC_10)
   else:
     model = FullStressModel()
-    train_all_data()
+    train_all_data(GC)
     for word in sys.argv[1:]:
-        annotate(word, "n.")
+        s = annotate(word, "n.")
+        print "====="
+        print util.print_stress(s)
+        print word
+
+
 
 else:
   model = FullStressModel()
