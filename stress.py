@@ -71,8 +71,14 @@ def derive_stress(word):
     # missing final stress marks?
 
 
-
-
+#takes a word with stress marking
+# returns a list of stresses as numbers
+# lower= most stressed, higher = less stressed
+# ex : ab*al`ien*a"tion
+# -> [2, 1, 2, 0, 1] 
+def get_stresses(word):
+  stress_and_index = derive_stress(word)
+  return [stress for index, stress in stress_and_index]
 
 
 # given a syllable (orthographic) give the index of its code
@@ -94,7 +100,7 @@ def find_syllable_core(syll):
         return syll.index("r")
     #TODO more heuristics? l, w, m, n, etc cores
     else:
-        print "#####", syll
+        #print "#####", syll
         return int(math.floor(len(syll)/2))
 
     # TODO maybe add a mitigating factor to force the core toward
@@ -138,6 +144,15 @@ def read_in(filename):
         data[unstressed_word] = stressed_word
 
     return data
+
+import re
+def split_sylls(word):
+  """ takes a word with stress marking: 'ab*al`ien*a"tion'
+  returns the divided sylls: ['ab' 'al' 'ien' 'a' 'tion']
+  """
+  s = re.split('([\*|\"|`])', word)
+  s = filter(lambda a: a not in INPUT_STRESS_MARKS and not a=='', s)
+  return s
 
 
 

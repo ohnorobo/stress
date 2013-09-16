@@ -155,6 +155,7 @@ class PartofSpeechStressModel:
     return self.counts[pos][tuple(stresses)] / self.counts[pos].total()
 
 
+import stress as util
 def score_accuracy(inputs, correct_outputs, f):
   correct = 0
   incorrect = 0
@@ -165,7 +166,13 @@ def score_accuracy(inputs, correct_outputs, f):
 
     if output != c_output:
       incorrect += 1
-      print "incorrect", (output, c_output)
+      print "~~~~~"
+      print "incorrect:"
+      print "  ", util.print_stress(output)
+      print "  ", input
+      print "actual:"
+      print "  ", util.print_stress(c_output)
+      print "  ", input
     else:
       correct += 1
 
@@ -175,7 +182,6 @@ def score_accuracy(inputs, correct_outputs, f):
   print "percent correct: ", (1.0*correct)/(correct+incorrect)
 
 
-import stress as util
 def train_all_data(filename):
   global model
 
@@ -251,6 +257,7 @@ def find_all_possible_stresses(n):
         copy.append(stress_mark)
         solutions.append(copy)
     return solutions
+
 
 ##main
 if __name__ == '__main__':
