@@ -3,12 +3,24 @@ Usage
 
 ###classifier.py
 
-In progress. Currently attempt to do stress classification for a list of unannotated words when run. About 70% accurate.
+In progress. Does stress classification on a list of input words.
 
-Example output:
+Example:
 
-    \-  / -
-    zoophoric
+    ./classifier.py twas brillig and the slithy toves
+
+     /
+    twas
+      /  -
+    brillig
+    /
+    and
+      /
+    the
+      /  -
+    slithy
+     / -
+    toves
 
 ###syllabification.py
 

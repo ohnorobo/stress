@@ -161,9 +161,8 @@ def split_sylls(word):
 if __name__ == "__main__":
     data = read_in(DATA_FILENAME)
 
-    for word in data.keys():
-        stressed_word = data[word]
-        stresses = derive_stress(stressed_word)
+    for word, correct in data.items():
+        stresses = derive_stress(correct)
 
         #print stressed_word
         print print_stress(stresses)
