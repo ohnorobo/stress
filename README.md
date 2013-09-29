@@ -1,5 +1,15 @@
 Usage
 
+
+###classifier.py
+
+In progress. Currently attempt to do stress classification for a list of unannotated words when run. About 70% accurate.
+
+Example output:
+
+    \-  / -
+    zoophoric
+
 ###syllabification.py
 
 ####command line
