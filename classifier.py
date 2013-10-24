@@ -4,6 +4,7 @@
 import nltk
 import syllabification as s
 import stress as util #utility functions
+import pprint
 
 TRAIN_FILENAME = "data/gcide/gc/train"
 TEST_FILENAME = "data/gcide/gc/test"
@@ -123,9 +124,25 @@ def get_low_classifier():
   all_features = get_all_features(all_pieces)
   return nltk.NaiveBayesClassifier.train(all_features)
 
-#def setup_low_classifier():
-#  global low
-#  low = get_low_classifier()
+
+##### HIGH CLASSIFIER #####
+
+from wordstress import WordStressModel
+def get_high_classifier():
+  all_wordlist = util.read_in(ALL_FILENAME)
+  model = WordStressModel()
+  for word, stressed in all_wordlist.items():
+    stress = [syll[1] for syll in util.derive_stress(stressed)]
+    #print "stressed", stressed
+    #print "derived stress", util.derive_stress(stressed)
+    #if (stress != [0]):
+    #  print "training on", stress
+    #else:
+    # print "bad"
+    model.train(stress)
+  print "model"
+  #pprint.pprint(model)
+  return model
 
 
 ###Score
@@ -157,12 +174,16 @@ def pick_stress(word):
   return zip(syll_nuclei, best_stress)
 
 def score(word, stresses, syll_nuclei):
-  #global high
+  global high
   global low
 
-  word_score = 1
+  #print stresses
+
+  word_score = high.score(stresses)
   syll_scores = [score_stress(word, stresses[i], syll_nuclei, i, low) for i in range(len(stresses))]
-  return word_score * .5 * reduce(lambda x, y: x*y, syll_scores, 1)
+  #print "word score", word_score
+  #print "syll scores", syll_scores
+  return pow(word_score, 2) * reduce(lambda x, y: x*y, syll_scores, 1)
 
 def score_stress(word, stress, nuclei, index, low):
   probs = low.prob_classify(get_features(index, nuclei, word))
@@ -173,8 +194,10 @@ def score_stress(word, stress, nuclei, index, low):
 
 
 
+
 #globals
-low = get_low_classifier()
+low = get_low_classifier() #classifier for individual syllables
+high = get_high_classifier() #'classifier' for entire stress patterns
 
 #main
 import sys

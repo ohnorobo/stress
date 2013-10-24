@@ -277,12 +277,10 @@ if __name__ == '__main__':
         print "====="
         print util.print_stress(s)
         print word
-
-
-
 else:
-  model = FullStressModel()
-  train_all_data()
+  pass
+  #model = FullStressModel()
+  #train_all_data()
   #wait
 
 
