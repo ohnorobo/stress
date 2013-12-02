@@ -191,8 +191,44 @@ def score_stress(word, stress, nuclei, index, low):
   #print probs._prob_dict
   return probs.prob(stress)
 
+def run_performance_test():
+  all_wordlist = util.read_in(ALL_FILENAME)
 
+  correct_count = 0
+  incorrect_count = 0
 
+  for word, stressed in all_wordlist.items():
+    actual_stress = util.derive_stress(stressed)
+    actual_just_stress = [syll[1] for syll in actual_stress]
+
+    found_stress = pick_stress(word)
+    found_just_stress = [syll[1] for syll in found_stress]
+
+    if (actual_just_stress == found_just_stress):
+      correct_count += 1
+      print "CORRECT"
+      print_score(correct_count, incorrect_count)
+
+      print util.print_stress(actual_stress)
+      print word
+    else:
+      incorrect_count += 1
+      print "FAILED"
+      print_score(correct_count, incorrect_count)
+
+      print "correct stress"
+      print util.print_stress(actual_stress)
+      print word
+      print "found stress"
+      print util.print_stress(found_stress)
+      print word
+    print " "
+    sys.stdout.flush() # make piping work correctly
+
+def print_score(cc, icc):
+      print("correct", cc, "incorrect", icc)
+      percentage = float(cc) / float(cc + icc)
+      print percentage
 
 
 #globals
@@ -203,10 +239,13 @@ high = get_high_classifier() #'classifier' for entire stress patterns
 import sys
 if __name__ == "__main__":
   if (sys.argv > 1):
-    for word in sys.argv[1:]:
-      stresses = pick_stress(word)
-      print util.print_stress(stresses)
-      print word
+    if (sys.argv[1] in ["-p", "--performance"]):
+      run_performance_test()
+    else:
+      for word in sys.argv[1:]:
+        stresses = pick_stress(word)
+        print util.print_stress(stresses)
+        print word
 
 
 
